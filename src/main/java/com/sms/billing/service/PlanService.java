@@ -17,29 +17,32 @@ public class PlanService {
     private final PlanRepository planRepository;
 
     @Transactional
-    public Plan createPlan(CreatePlanRequest request) {
+    public Plan createPlan(CreatePlanRequest request,String organizationId) {
         Plan plan = Plan.builder()
                 .name(request.getName())
                 .amount(request.getAmount())
                 .currency(request.getCurrency() == null ? "INR" : request.getCurrency())
-                .billingCycle(request.getBillingCycle())
+                .billingCycle(request.getBillingCycle().name())
+                .organizationId(organizationId)
                 .active(true)
                 .build();
         return planRepository.save(plan);
     }
 
-    public List<Plan> listActivePlans() {
-        return planRepository.findByActiveTrue();
+    public List<Plan> listActivePlans(String organizationId) {
+        return planRepository.findByActiveTrueAndOraganizationId(organizationId);
     }
 
-    public Plan getPlan(Long id) {
-        return planRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Plan not found: " + id));
+    public List<Plan> getAllPlan(String organizationId) {
+        return planRepository.findByOrganizationId(organizationId);
+    }
+    public Plan getPlan(String id, String organizationId) {
+        return planRepository.findByIdAndOrganizationId(id,organizationId);
     }
 
     @Transactional
-    public void deactivatePlan(Long id) {
-        Plan plan = getPlan(id);
+    public void deactivatePlan(String id, String organizationId) {
+        Plan plan = getPlan(id, organizationId);
         plan.setActive(false);
         planRepository.save(plan);
     }

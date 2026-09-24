@@ -23,8 +23,8 @@ import java.time.LocalDateTime;
 public class Customer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     /** Foreign reference to the owning organization/tenant. */
     @Column(nullable = false)

@@ -58,24 +58,26 @@ public class WebhookService {
     private void handlePaymentCaptured(JSONObject payload) {
         String razorpayPaymentId = extractPaymentId(payload);
         String razorpayOrderId = extractOrderId(payload);
+        String organizationId = extractOrganizationId(payload);
 
-        paymentRepository.findByRazorpayOrderId(razorpayOrderId).ifPresentOrElse(payment -> {
-            if (payment.getStatus() == Payment.Status.CAPTURED) {
-                // Already handled via the client-side verify flow - webhook is a
-                // redundant confirmation, which is expected and fine.
-                return;
-            }
-            payment.setStatus(Payment.Status.CAPTURED);
-            payment.setRazorpayPaymentId(razorpayPaymentId);
-            paymentRepository.save(payment);
-            invoiceService.markPaid(payment.getInvoice());
-        }, () -> log.warn("Webhook payment.captured for unknown order {}", razorpayOrderId));
+        paymentRepository.findByRazorpayOrderIdAndOrganizationId(razorpayOrderId, organizationId)
+                .ifPresentOrElse(payment -> {
+                    if (payment.getStatus() == Payment.Status.CAPTURED) {
+                        // Already handled via client-side verify flow
+                        return;
+                    }
+                    payment.setStatus(Payment.Status.CAPTURED);
+                    payment.setRazorpayPaymentId(razorpayPaymentId);
+                    paymentRepository.save(payment);
+                    invoiceService.markPaid(payment.getInvoice());
+                }, () -> log.warn("Webhook payment.captured for unknown order {}", razorpayOrderId));
     }
 
     private void handlePaymentFailed(JSONObject payload) {
         String razorpayOrderId = extractOrderId(payload);
+        String organizationid = extractOrganizationId(payload);
 
-        paymentRepository.findByRazorpayOrderId(razorpayOrderId).ifPresentOrElse(payment -> {
+        paymentRepository.findByRazorpayOrderIdAndOrganizationId(razorpayOrderId,organizationid).ifPresentOrElse(payment -> {
             payment.setStatus(Payment.Status.FAILED);
             payment.setFailureReason(extractErrorDescription(payload));
             paymentRepository.save(payment);
@@ -88,6 +90,12 @@ public class WebhookService {
                 .getJSONObject("payment")
                 .getJSONObject("entity")
                 .getString("id");
+    }
+    private String extractOrganizationId(JSONObject payload) {
+        return payload.getJSONObject("payload")
+                .getJSONObject("payment")
+                .getJSONObject("entity")
+                .getString("organizationId");
     }
 
     private String extractOrderId(JSONObject payload) {

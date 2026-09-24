@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "payments")
+@Table(name = "payments", indexes = @Index(name = "idx_payment_org", columnList = "organizationId"))
 @Data
 @Builder
 @NoArgsConstructor
@@ -18,10 +18,19 @@ import java.time.LocalDateTime;
 public class Payment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    /**
+     * Denormalized from Invoice. Also what lets the Razorpay webhook handler
+     * (which has no request-scoped tenant context - Razorpay doesn't know
+     * about your org model) resolve the correct organizationId directly from
+     * the Payment row it finds by razorpayOrderId/razorpayPaymentId.
+     */
+    @Column(nullable = false)
+    private String organizationId;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "invoice_id", nullable = false)
     private Invoice invoice;
 
@@ -36,14 +45,11 @@ public class Payment {
     @Builder.Default
     private Status status = Status.CREATED;
 
-    /** Razorpay order id, created up-front so the client can open Checkout. */
     @Column(unique = true)
     private String razorpayOrderId;
 
-    /** Populated once Razorpay reports the payment as captured/failed. */
     private String razorpayPaymentId;
 
-    /** Signature returned by Checkout for the client-side verification step. */
     private String razorpaySignature;
 
     private String paymentMethod;

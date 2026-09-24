@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "refunds")
+@Table(name = "refunds", indexes = @Index(name = "idx_refund_org", columnList = "organizationId"))
 @Data
 @Builder
 @NoArgsConstructor
@@ -18,8 +18,12 @@ import java.time.LocalDateTime;
 public class Refund {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+
+    /** Denormalized from Payment. */
+    @Column(nullable = false)
+    private String organizationId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "payment_id", nullable = false)

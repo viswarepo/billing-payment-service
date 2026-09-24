@@ -12,30 +12,36 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/plans")
+@RequestMapping("/api/v1/billing/plans")
 @RequiredArgsConstructor
 public class PlanController {
 
     private final PlanService planService;
 
-    @PostMapping
-    public ResponseEntity<Plan> createPlan(@Valid @RequestBody CreatePlanRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(planService.createPlan(request));
+    @PostMapping("/create")
+    public ResponseEntity<Plan> createPlan(
+            @RequestHeader("X-Organization-Id") String organizationId,
+            @Valid @RequestBody CreatePlanRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(planService.createPlan(request,organizationId));
     }
 
-    @GetMapping
-    public List<Plan> listPlans() {
-        return planService.listActivePlans();
+    @GetMapping("/all")
+    public List<Plan> listPlans(
+            @RequestHeader("X-Organization-Id") String organizationId){
+        return planService.getAllPlan(organizationId);
     }
 
     @GetMapping("/{id}")
-    public Plan getPlan(@PathVariable Long id) {
-        return planService.getPlan(id);
+    public Plan getPlan(@PathVariable String id,
+                        @RequestHeader("X-Organization-Id") String organizationId){
+        return planService.getPlan(id, organizationId);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deactivatePlan(@PathVariable Long id) {
-        planService.deactivatePlan(id);
+    public ResponseEntity<Void> deactivatePlan(
+            @RequestHeader("X-Organization-Id") String organizationId,
+            @PathVariable String id) {
+        planService.deactivatePlan(organizationId,id);
         return ResponseEntity.noContent().build();
     }
 }

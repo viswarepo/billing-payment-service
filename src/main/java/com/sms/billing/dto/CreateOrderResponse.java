@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateOrderResponse {
-    private Long paymentId;
+    private String paymentId;
     private String razorpayOrderId;
     private String razorpayKeyId;
     private BigDecimal amount;

@@ -28,8 +28,8 @@ public class RefundService {
     private final PaymentService paymentService;
 
     @Transactional
-    public Refund initiateRefund(Long paymentId, RefundRequest request) {
-        Payment payment = paymentService.getPayment(paymentId);
+    public Refund initiateRefund(String organizationId, String paymentId, RefundRequest request) {
+        Payment payment = paymentService.getPayment(organizationId, paymentId);
 
         if (payment.getStatus() != Payment.Status.CAPTURED
                 && payment.getStatus() != Payment.Status.PARTIALLY_REFUNDED) {
@@ -56,6 +56,7 @@ public class RefundService {
             String refundId = razorpayRefund.get("id");
 
             Refund refund = Refund.builder()
+                    .organizationId(organizationId)
                     .payment(payment)
                     .amount(refundAmount)
                     .status(Refund.Status.PROCESSED)
@@ -72,6 +73,7 @@ public class RefundService {
         } catch (RazorpayException e) {
             log.error("Refund failed for payment {}", paymentId, e);
             Refund failedRefund = Refund.builder()
+                    .organizationId(organizationId)
                     .payment(payment)
                     .amount(refundAmount)
                     .status(Refund.Status.FAILED)

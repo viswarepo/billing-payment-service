@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "invoices")
+@Table(name = "invoices", indexes = @Index(name = "idx_invoice_org", columnList = "organizationId"))
 @Data
 @Builder
 @NoArgsConstructor
@@ -19,10 +19,14 @@ import java.time.LocalDateTime;
 public class Invoice {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    /** Denormalized from Subscription so this table is independently queryable/indexable by tenant. */
+    @Column(nullable = false)
+    private String organizationId;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "subscription_id", nullable = false)
     private Subscription subscription;
 

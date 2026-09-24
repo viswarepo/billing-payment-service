@@ -10,9 +10,9 @@ import java.time.LocalDate;
 @Builder
 public class SubscriptionResponse {
 
-    private Long id;
-    private Long customerId;
-    private Long planId;
+    private String id;
+    private String customerId;
+    private String planId;
     private String planName;
     private Subscription.Status status;
     private LocalDate currentPeriodStart;
@@ -23,8 +23,8 @@ public class SubscriptionResponse {
         return SubscriptionResponse.builder()
                 .id(s.getId())
                 .customerId(s.getCustomer().getId())
-                .planId(s.getPlan().getId())
-                .planName(s.getPlan().getName())
+                .planId(s.getPlanId())
+                .planName(s.getPlanId())
                 .status(s.getStatus())
                 .currentPeriodStart(s.getCurrentPeriodStart())
                 .currentPeriodEnd(s.getCurrentPeriodEnd())

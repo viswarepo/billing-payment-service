@@ -12,8 +12,12 @@ import java.time.LocalDateTime;
 @Builder
 public class InvoiceResponse {
 
-    private Long id;
-    private Long subscriptionId;
+    private String id;
+    private String subscriptionId;
+    private String customerId;
+    private String customerName;
+    private String invoiceId;
+    private String paymentId;
     private BigDecimal amount;
     private String currency;
     private Invoice.Status status;
@@ -26,6 +30,8 @@ public class InvoiceResponse {
         return InvoiceResponse.builder()
                 .id(i.getId())
                 .subscriptionId(i.getSubscription().getId())
+                .customerId(i.getSubscription().getCustomer().getId())
+                .customerName(i.getSubscription().getCustomer().getName())
                 .amount(i.getAmount())
                 .currency(i.getCurrency())
                 .status(i.getStatus())

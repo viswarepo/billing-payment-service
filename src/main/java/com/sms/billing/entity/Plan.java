@@ -18,8 +18,17 @@ import java.time.LocalDateTime;
 public class Plan {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+
+    @Column(nullable = false)
+    private String organizationId;
+
+    @Column(nullable = false)
+    private String planId;
+
+    @Column(nullable = false)
+    private String productId;
 
     @Column(nullable = false)
     private String name;
@@ -31,9 +40,9 @@ public class Plan {
     @Builder.Default
     private String currency = "INR";
 
-    @Enumerated(EnumType.STRING)
+    //@Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BillingCycle billingCycle;
+    private String billingCycle;
 
     /** Populated once the matching plan has been created on Razorpay's side. */
     private String razorpayPlanId;
