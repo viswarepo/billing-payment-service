@@ -64,10 +64,11 @@ public class PaymentController {
     }
 
 
-    @GetMapping("/history")
+    @GetMapping("/history/{userRole}")
     public List<PaymentResponse> paymentHistory(
-            @RequestHeader("X-Organization-Id") @NotBlank String organizationId){
-         return paymentService.getPaymentHistory(organizationId).stream()
+            @RequestHeader("X-Organization-Id") @NotBlank String organizationId,
+            @PathVariable String userRole){
+         return paymentService.getPaymentHistory(organizationId, userRole).stream()
                 .map(PaymentResponse::from)
                 .toList();
     }

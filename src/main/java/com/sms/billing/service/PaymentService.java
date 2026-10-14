@@ -7,9 +7,7 @@ import com.razorpay.Utils;
 import com.sms.billing.dto.CreateOrderResponse;
 import com.sms.billing.dto.PaymentFailureRequest;
 import com.sms.billing.dto.VerifyPaymentRequest;
-import com.sms.billing.entity.Invoice;
-import com.sms.billing.entity.Payment;
-import com.sms.billing.entity.Subscription;
+import com.sms.billing.entity.*;
 import com.sms.billing.exception.InvalidRequestException;
 import com.sms.billing.exception.PaymentVerificationException;
 import com.sms.billing.exception.ResourceNotFoundException;
@@ -197,9 +195,15 @@ String rp =order.get("razorpayPaymantId");
     }
 
 
-    public List<Payment> getPaymentHistory(String organizationId) {
-        return paymentRepository.findByOrganizationId(organizationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Payment Details found: " + organizationId));
+    public List<Payment> getPaymentHistory(String organizationId, String userRole) {
+        if(userRole.equals(ERole.ROLE_OWNER.name())) {
+            return paymentRepository.findAllPaymentHistory(ECustomerType.TENANT.name())
+                    .orElseThrow(() -> new ResourceNotFoundException("Payment Details found: " + organizationId));
+        }else{
+            return paymentRepository.findPaymentHistoryByOrganization(organizationId,ECustomerType.CUSTOMER.name())
+                    .orElseThrow(() -> new ResourceNotFoundException("Payment Details found: " + organizationId));
+
+        }
     }
 
     private long toSmallestUnit(BigDecimal amount) {

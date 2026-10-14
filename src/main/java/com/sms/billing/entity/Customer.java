@@ -26,6 +26,8 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    private String customerType;
+
     /** Foreign reference to the owning organization/tenant. */
     @Column(nullable = false)
     private String organizationId;

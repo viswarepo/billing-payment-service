@@ -2,6 +2,7 @@ package com.sms.billing.repository;
 
 import com.sms.billing.entity.Subscription;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,4 +22,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Stri
      */
     List<Subscription> findByStatusAndNextBillingDateLessThanEqual(
             Subscription.Status status, LocalDate date);
+
+    @Query("SELECT s FROM Subscription s WHERE s.status = 'ACTIVE' AND s.organizationId = :organizationId")
+    List<Subscription> findByOrganizationIdAndActiveStatus(String organizationId);
 }
