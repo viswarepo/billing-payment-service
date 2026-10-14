@@ -3,6 +3,8 @@ package com.sms.billing.service;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.sms.billing.entity.ECustomerType;
+import com.sms.billing.entity.ERole;
 import com.sms.billing.entity.Invoice;
 import com.sms.billing.entity.Subscription;
 import com.sms.billing.exception.ResourceNotFoundException;
@@ -17,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -54,8 +58,13 @@ public class InvoiceService {
         return invoiceRepository.findByOrganizationIdAndSubscription_Customer_Email(organizationId, email);
     }
 
-    public List<Invoice> fullInvoiceHistory(String organizationId) {
-        return invoiceRepository.findByOrganizationId(organizationId);
+    public List<Invoice> fullInvoiceHistory(String organizationId, String userRole) {
+        if(userRole.equals(ERole.ROLE_OWNER.name())){
+            return invoiceRepository.findBySubscription_Customer_CustomerType(ECustomerType.TENANT.name());
+        }else{
+            return invoiceRepository.findByOrganizationIdAndSubscription_Customer_CustomerType(organizationId,ECustomerType.CUSTOMER.name());
+        }
+
     }
 
     public ResponseEntity<InputStreamResource> generateAndDownloadInvoice(String invoiceId, String customerName, String subscriptionId, double amount, String currency) {
@@ -85,6 +94,14 @@ public class InvoiceService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to generate invoice PDF", e);
         }
+    }
+
+    public void calulateRevenue(){
+        LocalDateTime start = LocalDate.of(2026, 4, 1).atStartOfDay();
+        LocalDateTime end   = LocalDate.of(2027, 3, 31).atTime(23, 59, 59);
+
+        BigDecimal fyRevenue = invoiceRepository.calculateRevenueForPeriod(start, end);
+
     }
 
 

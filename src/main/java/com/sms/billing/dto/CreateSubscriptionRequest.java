@@ -20,6 +20,8 @@ public class CreateSubscriptionRequest {
     private String customerEmail;
 
     private String customerPhone;
+    private String customerType;
+
 
     /** References a plan owned by plan-catalog-service - not a local entity. */
     @NotNull

@@ -1,8 +1,6 @@
 package com.sms.billing.event;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
@@ -21,6 +19,7 @@ public record SubscriptionCreatedEvent(
         String customerId,
         String customerEmail,
         String customerName,
+        String customerType,
         String productCode,
         String planCode,
         int planVersion,
@@ -28,6 +27,7 @@ public record SubscriptionCreatedEvent(
         String currency,
         String billingCycle,
         int trialDays,
+        String mobile,
         Date occurredAt
 ) {
 }
