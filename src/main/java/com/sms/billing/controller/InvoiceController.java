@@ -46,11 +46,12 @@ public class InvoiceController {
                 .toList();
     }
 
-    @GetMapping("/history")
+    @GetMapping("/history/{userRole}")
     public List<InvoiceResponse> fullInvoiceHistory(
-            @RequestHeader("X-Organization-Id") @NotBlank String organizationId)
-            {
-        return invoiceService.fullInvoiceHistory(organizationId).stream()
+            @RequestHeader("X-Organization-Id") @NotBlank String organizationId,
+            @PathVariable String userRole){
+
+        return invoiceService.fullInvoiceHistory(organizationId, userRole).stream()
                 .map(InvoiceResponse::from)
                 .toList();
     }

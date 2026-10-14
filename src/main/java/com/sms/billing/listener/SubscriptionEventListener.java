@@ -65,6 +65,7 @@ public class SubscriptionEventListener {
         CreateSubscriptionRequest request = new CreateSubscriptionRequest();
         request.setCustomerName(event.customerName());
         request.setCustomerEmail(event.customerEmail());
+        request.setCustomerType(event.customerType());
         // planId bridges subscription-service's productCode+planCode+planVersion
         // triple into billing-service's single required planId string - see
         // the field javadoc on Subscription.planId for why.
